@@ -60,7 +60,7 @@ func NewSiteService(props utils.Map) (SiteService, error) {
 		return nil, err
 	}
 	// Open RegionDB Service
-	p.dbRegion, err = platform_services.OpenRegionDatabaseService(props)
+	p.dbRegion, err = platform_service.OpenRegionDatabaseService(props)
 	if err != nil {
 		p.CloseDatabaseService()
 		return nil, err
