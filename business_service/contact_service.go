@@ -1,4 +1,4 @@
-package business_services
+package business_service
 
 import (
 	"fmt"

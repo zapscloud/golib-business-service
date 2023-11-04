@@ -1,4 +1,4 @@
-package business_services
+package business_service
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 	"github.com/zapscloud/golib-dbutils/db_common"
 	"github.com/zapscloud/golib-dbutils/db_utils"
 	"github.com/zapscloud/golib-platform-repository/platform_repository"
-	platform_services "github.com/zapscloud/golib-platform-service/platform_service"
+	"github.com/zapscloud/golib-platform-service/platform_service"
 	"github.com/zapscloud/golib-utils/utils"
 )
 
