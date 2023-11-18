@@ -15,11 +15,11 @@ import (
 // TerritoryService - Territorys Service structure
 type TerritoryService interface {
 	List(filter string, sort string, skip int64, limit int64) (utils.Map, error)
-	GetDetails(territoryid string) (utils.Map, error)
+	GetDetails(territory_id string) (utils.Map, error)
 	Find(filter string) (utils.Map, error)
 	Create(indata utils.Map) (utils.Map, error)
-	Update(territoryid string, indata utils.Map) (utils.Map, error)
-	Delete(territoryid string) error
+	Update(territory_id string, indata utils.Map) (utils.Map, error)
+	Delete(territory_id string) error
 
 	BeginTransaction()
 	CommitTransaction()
@@ -94,7 +94,7 @@ func (p *territoryBaseService) EndService() {
 
 func (p *territoryBaseService) initializeService() {
 	log.Printf("TerritoryService:: GetBusinessDao ")
-	p.daoTerritory = business_repository.NewSiteDao(p.dbRegion.GetClient(), p.businessID)
+	p.daoTerritory = business_repository.NewTerritoryDao(p.dbRegion.GetClient(), p.businessID)
 	p.daoBusiness = platform_repository.NewBusinessDao(p.GetClient())
 }
 
