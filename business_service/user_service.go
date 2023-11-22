@@ -16,11 +16,11 @@ import (
 // UserService - Users Service structure
 type UserService interface {
 	List(filter string, sort string, skip int64, limit int64) (utils.Map, error)
-	Get(userid string) (utils.Map, error)
+	Get(userId string) (utils.Map, error)
 	Find(filter string) (utils.Map, error)
 	Create(dataUser utils.Map) (utils.Map, error)
-	Update(userid string, indata utils.Map) (utils.Map, error)
-	Delete(userid string, delete_permanent bool) error
+	Update(userId string, indata utils.Map) (utils.Map, error)
+	Delete(userId string, delete_permanent bool) error
 
 	BeginTransaction()
 	CommitTransaction()
@@ -35,6 +35,7 @@ type userBaseService struct {
 	dbRegion    db_utils.DatabaseService
 	daoUser     business_repository.UserDao
 	daoBusiness platform_repository.BusinessDao
+	daoAppUser  platform_repository.AppUserDao
 	child       UserService
 	businessID  string
 }
@@ -96,6 +97,7 @@ func (p *userBaseService) initializeService() {
 	log.Printf("UserService:: initializeService ")
 	p.daoUser = business_repository.NewUserDao(p.dbRegion.GetClient(), p.businessID)
 	p.daoBusiness = platform_repository.NewBusinessDao(p.GetClient())
+	p.daoAppUser = platform_repository.NewAppUserDao(p.GetClient())
 }
 
 // List - List All records
@@ -109,15 +111,41 @@ func (p *userBaseService) List(filter string, sort string, skip int64, limit int
 		return nil, err
 	}
 
+	// Enumerate User List
+	if dataVal, dataOk := response[db_common.LIST_RESULT]; dataOk {
+		for _, value := range dataVal.([]utils.Map) {
+			// Get UserId
+			userId, _ := utils.GetMemberDataStr(value, business_common.FLD_USER_ID)
+
+			// Get UserDetails
+			userInfo, err := p.daoAppUser.Get(userId)
+			if err == nil {
+				// Add UserInfo
+				value[business_common.FLD_USER_INFO] = userInfo
+			} else {
+				value[business_common.FLD_USER_INFO] = utils.Map{}
+			}
+		}
+	}
+
 	log.Println("UserService::FindAll - End ")
 	return response, nil
 }
 
 // FindByCode - Find By Code
-func (p *userBaseService) Get(appuserid string) (utils.Map, error) {
-	log.Printf("UserService::FindByCode::  Begin %v", appuserid)
+func (p *userBaseService) Get(userId string) (utils.Map, error) {
+	log.Printf("UserService::FindByCode::  Begin %v", userId)
 
-	data, err := p.daoUser.Get(appuserid)
+	data, err := p.daoUser.Get(userId)
+	if err != nil {
+		userInfo, err := p.daoAppUser.Get(userId)
+		if err == nil {
+			// Add UserInfo
+			data[business_common.FLD_USER_INFO] = userInfo
+		} else {
+			data[business_common.FLD_USER_INFO] = utils.Map{}
+		}
+	}
 	log.Println("UserService::FindByCode:: End ", err)
 	return data, err
 }
@@ -126,6 +154,18 @@ func (p *userBaseService) Find(filter string) (utils.Map, error) {
 	fmt.Println("UserService::FindByCode::  Begin ", filter)
 
 	data, err := p.daoUser.Find(filter)
+	if err != nil {
+		// Get UserId
+		userId, _ := utils.GetMemberDataStr(data, business_common.FLD_USER_ID)
+
+		userInfo, err := p.daoAppUser.Get(userId)
+		if err == nil {
+			// Add UserInfo
+			data[business_common.FLD_USER_INFO] = userInfo
+		} else {
+			data[business_common.FLD_USER_INFO] = utils.Map{}
+		}
+	}
 	log.Println("UserService::FindByCode:: End ", data, err)
 	return data, err
 }
@@ -149,11 +189,11 @@ func (p *userBaseService) Create(datauser utils.Map) (utils.Map, error) {
 }
 
 // Update - Update Service
-func (p *userBaseService) Update(userid string, indata utils.Map) (utils.Map, error) {
+func (p *userBaseService) Update(userId string, indata utils.Map) (utils.Map, error) {
 
 	log.Println("UserService::Update - Begin")
 
-	data, err := p.daoUser.Get(userid)
+	data, err := p.daoUser.Get(userId)
 	if err != nil {
 		return data, err
 	}
@@ -162,18 +202,18 @@ func (p *userBaseService) Update(userid string, indata utils.Map) (utils.Map, er
 	delete(indata, business_common.FLD_BUSINESS_ID)
 	delete(indata, business_common.FLD_USER_ID)
 
-	data, err = p.daoUser.Update(userid, indata)
+	data, err = p.daoUser.Update(userId, indata)
 	log.Println("UserService::Update - End ")
 	return data, err
 }
 
 // Delete - Delete Service
-func (p *userBaseService) Delete(userid string, deletePermanent bool) error {
+func (p *userBaseService) Delete(userId string, deletePermanent bool) error {
 
-	log.Println("UserService::Delete - Begin", userid)
+	log.Println("UserService::Delete - Begin", userId)
 
 	if deletePermanent {
-		result, err := p.daoUser.Delete(userid)
+		result, err := p.daoUser.Delete(userId)
 		if err != nil {
 			return err
 		}
@@ -181,7 +221,7 @@ func (p *userBaseService) Delete(userid string, deletePermanent bool) error {
 	} else {
 		indata := utils.Map{db_common.FLD_IS_DELETED: true}
 
-		data, err := p.Update(userid, indata)
+		data, err := p.Update(userId, indata)
 		if err != nil {
 			return err
 		}

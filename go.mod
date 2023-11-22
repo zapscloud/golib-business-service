@@ -3,11 +3,11 @@ module github.com/zapscloud/golib-business-service
 go 1.20
 
 require (
-	github.com/zapscloud/golib-business-repository v0.0.0-20231101044633-55bc7df53d6f
-	github.com/zapscloud/golib-dbutils v1.1.1-0.20231016071702-b6e244391427
-	github.com/zapscloud/golib-platform-repository v0.0.0-20231104045312-797a30003891
+	github.com/zapscloud/golib-business-repository v0.0.0-20231122152828-b8c39320b349
+	github.com/zapscloud/golib-dbutils v1.1.1-0.20231102092500-6b81e3531d53
+	github.com/zapscloud/golib-platform-repository v0.0.0-20231122060842-7f09c52e6a38
 	github.com/zapscloud/golib-platform-service v0.0.0-20231104052444-07da4e75a984
-	github.com/zapscloud/golib-utils v1.0.1-0.20231013125100-bb65f5737443
+	github.com/zapscloud/golib-utils v1.0.1-0.20231117081529-93ad4f30cea1
 
 )
 
