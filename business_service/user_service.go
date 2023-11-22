@@ -137,7 +137,7 @@ func (p *userBaseService) Get(userId string) (utils.Map, error) {
 	log.Printf("UserService::FindByCode::  Begin %v", userId)
 
 	data, err := p.daoUser.Get(userId)
-	if err != nil {
+	if err == nil {
 		userInfo, err := p.daoAppUser.Get(userId)
 		if err == nil {
 			// Add UserInfo
@@ -154,7 +154,7 @@ func (p *userBaseService) Find(filter string) (utils.Map, error) {
 	fmt.Println("UserService::FindByCode::  Begin ", filter)
 
 	data, err := p.daoUser.Find(filter)
-	if err != nil {
+	if err == nil {
 		// Get UserId
 		userId, _ := utils.GetMemberDataStr(data, business_common.FLD_USER_ID)
 
