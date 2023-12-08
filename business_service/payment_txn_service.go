@@ -147,7 +147,7 @@ func (p *PaymentTxnBaseService) Create(indata utils.Map) (utils.Map, error) {
 	if dataok {
 		PaymentTxnId = strings.ToLower(dataval.(string))
 	} else {
-		PaymentTxnId = utils.GenerateUniqueId("pay_txn")
+		PaymentTxnId = utils.GenerateUniqueId("paytxn")
 		log.Println("Unique PaymentTxn ID", PaymentTxnId)
 	}
 
