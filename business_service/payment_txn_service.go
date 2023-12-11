@@ -150,11 +150,12 @@ func (p *PaymentTxnBaseService) Create(indata utils.Map) (utils.Map, error) {
 		PaymentTxnId = utils.GenerateUniqueId("paytxn")
 		log.Println("Unique PaymentTxn ID", PaymentTxnId)
 	}
-
+	dateTime := time.Now().Format(time.DateTime)
 	//BusinessPaymentTxn
+	indata[business_common.FLD_DATE_TIME] = dateTime
 	indata[business_common.FLD_BUSINESS_ID] = p.businessId
 	indata[business_common.FLD_PAYMENT_TXN_ID] = PaymentTxnId
-	indata[business_common.FLD_DATETIME] = time.Now().UTC()
+
 
 	data, err := p.daoPaymentTxn.Create(indata)
 	if err != nil {
